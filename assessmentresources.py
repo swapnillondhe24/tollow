@@ -9,7 +9,7 @@ from flaskext.mysql import MySQL
 from flask import request
 from flask_cors import CORS
 import mysql.connector
-from commonUtils.commonUtils import create_json
+from commonUtils.commonUtils import create_json , param_verfication
 from datetime import datetime
 
 
@@ -27,6 +27,19 @@ app.config['MYSQL_DATABASE_DB'] = 'tollow'
 app.config['MYSQL_DATABASE_HOST'] = 'localhost'
 
 mysql = MySQL(app)
+codes = {'info': 'info', 
+        'success': '200', 
+        'invalid request': '400', 
+        'missing environment variables': '400', 
+        'configuration file missing': '400', 
+        'internal error': '500', 
+        'connection error': '501', 
+        'database error': '502', 
+        'incorrect Parameters': '401', 
+        'directory missing' : '400', 
+        'invalid method':'405', 
+        'no Write Permission': '400', 
+        'no records': '404'}
 
 
         
@@ -71,19 +84,6 @@ class studentDetails(Resource):
         print (record_list)
         result = create_json('success', record_list)
         return result
-
-
-def param_verfication(request_json,request_list):
-    """Function To Check the passing parameters"""
-    # result = {}
-    count = 0
-    for param in request_list :
-        count+=1
-        if param in request_json and request_json[param] :
-            pass
-        else :
-            return 'invalid request'
-    return 'success'
 
 
 api.add_resource(studentDetails, '/studentdetails/')

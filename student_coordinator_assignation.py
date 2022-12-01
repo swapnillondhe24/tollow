@@ -26,6 +26,20 @@ app.config['MYSQL_DATABASE_PASSWORD'] = ''
 app.config['MYSQL_DATABASE_DB'] = 'tollow'
 app.config['MYSQL_DATABASE_HOST'] = 'localhost'
 
+codes = {'info': 'info'
+    , 'success': '200'
+    , 'invalid request': '400'
+    , 'missing environment variables': '400'
+    , 'configuration file missing': '400'
+    , 'internal error': '500'
+    , 'connection error': '501'
+    , 'database error': '502'
+    , 'incorrect Parameters': '401'
+    , 'directory missing' : '400'
+    , 'invalid method':'405'
+    , 'no Write Permission': '400'
+    , 'no records': '404'}
+
 mysql = MySQL(app)
 
 class roleDisplay(Resource):
@@ -38,11 +52,9 @@ class roleDisplay(Resource):
 
         conn = mysql.connect()
         cursor = conn.cursor()
-        cursor.execute('''Select email from tollow.user_info where 
-                                                    role = %s
-                                                and school_name = %s
-                                                and active = %s 
-                        ''', ( request_json['role'], request_json['schools'], request_json['active']))
+        cursor.execute('''Select email from tollow.user_info where role = %s and school_name = %s and active = %s ''', 
+                        ( request_json['role'], request_json['schools'], request_json['active']))
+        
         record = [dict((cursor.description[i][0], value) for i, value in enumerate(row)) for row in
                   cursor.fetchall()]
 

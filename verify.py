@@ -89,8 +89,7 @@ class rolesDisplay(Resource):
 
         conn = mysql.connect()
         cursor = conn.cursor()
-        cursor.execute('''Select role_name from tollow.user_role where registration_page=%s ''',
-                       ('yes'))
+        cursor.execute('''Select role_name from tollow.user_role where registration_page=%s ''', ('yes'))
         record = cursor.fetchall()
         if not record:
             return create_json('invalid request', "no records found")

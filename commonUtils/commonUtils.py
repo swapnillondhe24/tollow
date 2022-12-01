@@ -31,7 +31,7 @@ def create_json(msg, custom_msg):
             result = json.dumps(result)
             return result
         if not codes[msg]:
-            result = {'headers': {'Content-Type': 'application/json'}, 'statusCode': 'none', 'body': 'incvalid '
+            result = {'headers': {'Content-Type': 'application/json'}, 'statusCode': 'none', 'body': 'invalid '
                                                                                                      'response code'}
             result = json.dumps(result)
             return result
@@ -40,6 +40,20 @@ def create_json(msg, custom_msg):
         res = create_json(msg, str(e))
         return res
 
+def param_verfication(request_json,request_list):
+    """Function To Check the passing parameters"""
+    # result = {}
+    count = 0
+    for param in request_list :
+        count+=1
+        if param in request_json and request_json[param] :
+            pass
+        else :
+            return 'invalid request'
+    return 'success'
 
-def encrypt(msg, key):
-    pass
+def listToString(s):
+    st = ","
+    s = eval(s)
+    
+    return st.join(s)

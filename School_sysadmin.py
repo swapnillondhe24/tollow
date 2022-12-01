@@ -29,6 +29,20 @@ app.config['MYSQL_DATABASE_HOST'] = 'localhost'
 
 mysql = MySQL(app)
 
+codes = {'info': 'info'
+    , 'success': '200'
+    , 'invalid request': '400'
+    , 'missing environment variables': '400'
+    , 'configuration file missing': '400'
+    , 'internal error': '500'
+    , 'connection error': '501'
+    , 'database error': '502'
+    , 'incorrect Parameters': '401'
+    , 'directory missing' : '400'
+    , 'invalid method':'405'
+    , 'no Write Permission': '400'
+    , 'no records': '404'}
+
 class userCount(Resource):
     def post(self):
         request_json = request.get_json()

@@ -10,7 +10,12 @@ from flask import request
 from flask_cors import CORS
 import mysql.connector
 from datetime import datetime
+import logging
+from commonUtils.commonUtils import create_json, param_verfication
 
+
+logging.basicConfig(level=logging.DEBUG)
+LOGGER = logging.getLogger(__name__)
 
 
 api = ''
@@ -27,6 +32,19 @@ app.config['MYSQL_DATABASE_DB'] = 'tollow'
 app.config['MYSQL_DATABASE_HOST'] = 'localhost'
 
 mysql = MySQL(app)
+codes = {'info': 'info'
+    , 'success': '200'
+    , 'invalid request': '400'
+    , 'missing environment variables': '400'
+    , 'configuration file missing': '400'
+    , 'internal error': '500'
+    , 'connection error': '501'
+    , 'database error': '502'
+    , 'incorrect Parameters': '401'
+    , 'directory missing' : '400'
+    , 'invalid method':'405'
+    , 'no Write Permission': '400'
+    , 'no records': '404'}
 
 class newStudentIEP(Resource):
     def post(self):
@@ -58,6 +76,7 @@ class newStudentIEP(Resource):
                         , request_json['active']
                         , request_json['learning_coordinator']))
         print(mysql_query)
+        LOGGER.debug(mysql_query)
         cursor.execute('''Select count(*) from tollow.user_info as info, tollow.assessment_request as req where 
                                 info.iep = %s 
                             and info.assessment_request = %s 
@@ -74,6 +93,7 @@ class newStudentIEP(Resource):
                         , request_json['learning_coordinator']))
         record = cursor.fetchone()
         print (record)
+        LOGGER.debug(mysql_query)
         if not record or record[0] == 0:
             return create_json('no records', "no records found")
         record_list = []
@@ -94,6 +114,7 @@ class studentAssessnment(Resource):
             return create_json('invalid request', "invalid request")
 
         conn = mysql.connect()
+        LOGGER.info("Mysql Connection Successful")
         cursor = conn.cursor()
         cursor.execute('''Select count(*) from tollow.user_info as info, tollow.assessment_request as req where 
                                 assessment_request = %s 
@@ -118,48 +139,12 @@ class studentAssessnment(Resource):
         
 
 
-def create_json(msg, custom_msg) :
-    """Function To Create The JSON"""
-    response_listing = []
-    try :
-        result = {}
-        if type(custom_msg) != list and type != dict:
-            custom_msg = str(custom_msg)
-            response_listing.append(custom_msg)
-
-        if codes[msg] :
-            if codes[msg] == '200':
-                result = {'headers': {'Content-Type': 'application/json'}, 'statusCode': codes[msg], 'body': custom_msg}
-            else :
-                result = {'headers': {'Content-Type': 'application/json'}, 'statusCode': codes[msg], 'body': custom_msg}
-            result = json.dumps(result)
-            return result
-        if not codes[msg] :
-            result = {'headers': {'Content-Type': 'application/json'}, 'statusCode': 'none', 'body': 'incvalid '
-                                                                                                     'response code'}
-            result = json.dumps(result)
-            return result
-    except Exception as e:
-        msg = 'Invalid Request'
-        res = create_json(msg, str(e))
-        return res
-
-def param_verfication(request_json,request_list):
-    """Function To Check the passing parameters"""
-    # result = {}
-    count = 0
-    for param in request_list :
-        count+=1
-        if param in request_json and request_json[param] :
-            pass
-        else :
-            return 'invalid request'
-    return 'success'
 
 api.add_resource(newStudentIEP, '/studentiepcount/')
 api.add_resource(studentAssessnment, '/studentassessmentcount/')
-
+app.add_url_rule('/logging', endpoint='logging_get', methods=['GET'])
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5009)
+    LOGGER.info("Server Started")
     app.run(debug=True)
